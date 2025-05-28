@@ -1,0 +1,60 @@
+package org.opendatamesh.platform.pp.marketplace.accessrequests.services.submitter;
+
+import org.opendatamesh.platform.pp.marketplace.accessrequests.entities.AccessRequest;
+import org.opendatamesh.platform.pp.marketplace.client.ExecutorClient;
+import org.opendatamesh.platform.pp.marketplace.configuration.executor.MarketplaceExecutorConfig;
+import org.opendatamesh.platform.pp.marketplace.rest.v1.resources.executors.MarketplaceExecutorRequestRes;
+
+import java.util.List;
+
+class AccessRequestSubmitterExecutorOutputPortImpl implements AccessRequestSubmitterExecutorOutputPort {
+
+    private final MarketplaceExecutorConfig executorConfig;
+    private final ExecutorClient executorClient;
+
+    public AccessRequestSubmitterExecutorOutputPortImpl(MarketplaceExecutorConfig executorConfig, ExecutorClient executorClient) {
+        this.executorConfig = executorConfig;
+        this.executorClient = executorClient;
+    }
+
+    @Override
+    public List<MarketplaceExecutorConfig.MarketplaceExecutor> getExecutorsConfig() {
+        return executorConfig.getMarketplaceExecutors();
+    }
+
+    @Override
+    public void submitRequest(String executorBaseUrl, AccessRequest accessRequest) {
+        MarketplaceExecutorRequestRes executorRequest = new MarketplaceExecutorRequestRes();
+        executorRequest.setV("1.0");
+        executorRequest.setOperation(accessRequest.getOperation().name());
+        
+        MarketplaceExecutorRequestRes.RequestInfo requestInfo = new MarketplaceExecutorRequestRes.RequestInfo();
+        requestInfo.setName(accessRequest.getName());
+        requestInfo.setIdentifier(accessRequest.getIdentifier());
+        
+        // Set provider info
+        MarketplaceExecutorRequestRes.ProviderInfo providerInfo = new MarketplaceExecutorRequestRes.ProviderInfo();
+        providerInfo.setDataProductFqn(accessRequest.getProviderDataProductFqn());
+        providerInfo.setDataProductPortsFqn(accessRequest.getProviderDataProductPortsFqn());
+        requestInfo.setProvider(providerInfo);
+        
+        // Set consumer info
+        MarketplaceExecutorRequestRes.ConsumerInfo consumerInfo = new MarketplaceExecutorRequestRes.ConsumerInfo();
+        consumerInfo.setType(accessRequest.getConsumerType());
+        consumerInfo.setIdentifier(accessRequest.getConsumerIdentifier());
+        requestInfo.setConsumer(consumerInfo);
+        
+        // Set requester info (using consumer info since requester info is not in AccessRequest)
+        MarketplaceExecutorRequestRes.RequesterInfo requesterInfo = new MarketplaceExecutorRequestRes.RequesterInfo();
+        requesterInfo.setType(accessRequest.getConsumerType());
+        requesterInfo.setIdentifier(accessRequest.getConsumerIdentifier());
+        requestInfo.setRequester(requesterInfo);
+        
+        // Set dates
+        requestInfo.setStartDate(accessRequest.getStartDate());
+        requestInfo.setEndDate(accessRequest.getEndDate());
+        
+        executorRequest.setRequest(requestInfo);
+        executorClient.postRequest(executorBaseUrl, executorRequest);
+    }
+} 
