@@ -10,7 +10,7 @@ public class MarketplaceExecutorResponseRes extends VersionedRes {
 
     @Schema(description = "Identifier of the access request this response is for", example = "AR-123")
     private String accessRequestIdentifier;
-    @Schema(description = "Status of the executor response", example = "SUCCESS")
+    @Schema(description = "Status of the executor response", example = "GRANTED")
     private ExecutorResponseStatus status;
     @Schema(description = "Message from the executor", example = "Access request processed successfully")
     private String message;
