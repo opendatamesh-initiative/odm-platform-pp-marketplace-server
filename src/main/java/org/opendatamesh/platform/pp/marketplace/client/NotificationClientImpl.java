@@ -11,7 +11,7 @@ public class NotificationClientImpl implements NotificationClient {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private static final String NOTIFICATION_ENDPOINT = "api/v1/notifications";
+    private static final String NOTIFICATION_ENDPOINT = "api/v1/pp/notification/dispatch";
     private final RestUtils restUtils;
     private final String notificationServiceBaseUrl;
 

@@ -11,7 +11,7 @@ spring:
 odm:
   product-plane:
     notification-service:
-      address: http://localhost:8083
+      address: http://localhost:8006
       active: true
   utility-plane:
     marketplace-executors:

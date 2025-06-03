@@ -8,8 +8,8 @@ import java.util.Date;
 import java.util.List;
 
 public class ExecutorResultReceivedEvent {
-    public static final String EVENT_VERSION = "1.0.0";
-    public static final String EVENT_TYPE = "MARKETPLACE_EXECUTOR_RESULT_RECEIVED";
+    private final String version = "1.0.0";
+    private final String type = "MARKETPLACE_EXECUTOR_RESULT_RECEIVED";
 
     private ExecutorResultReceivedEventState beforeState;
     private ExecutorResultReceivedEventState afterState;
@@ -22,12 +22,12 @@ public class ExecutorResultReceivedEvent {
         this.afterState = afterState;
     }
 
-    public String getEventVersion() {
-        return EVENT_VERSION;
+    public String getVersion() {
+        return version;
     }
 
-    public String getEventType() {
-        return EVENT_TYPE;
+    public String getType() {
+        return type;
     }
 
     public ExecutorResultReceivedEventState getBeforeState() {
