@@ -44,10 +44,10 @@ class AccessRequestSubmitterExecutorOutputPortImpl implements AccessRequestSubmi
         consumerInfo.setIdentifier(accessRequest.getConsumerIdentifier());
         requestInfo.setConsumer(consumerInfo);
         
-        // Set requester info (using consumer info since requester info is not in AccessRequest)
+        // Set requester info
         MarketplaceExecutorRequestRes.RequesterInfo requesterInfo = new MarketplaceExecutorRequestRes.RequesterInfo();
-        requesterInfo.setType(accessRequest.getConsumerType());
-        requesterInfo.setIdentifier(accessRequest.getConsumerIdentifier());
+        requesterInfo.setType(accessRequest.getRequesterType());
+        requesterInfo.setIdentifier(accessRequest.getRequesterIdentifier());
         requestInfo.setRequester(requesterInfo);
         
         // Set dates

@@ -5,6 +5,8 @@ CREATE TABLE marketplace_access_requests (
     name VARCHAR(255) NOT NULL,
     identifier VARCHAR(255) NOT NULL,
     operation VARCHAR(50) NOT NULL,
+    requester_type VARCHAR(255),
+    requester_identifier VARCHAR(255),
     reviewer_identifier VARCHAR(255),
     consumer_type VARCHAR(50) NOT NULL,
     consumer_identifier VARCHAR(255) NOT NULL,

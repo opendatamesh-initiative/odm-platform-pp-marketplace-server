@@ -28,6 +28,12 @@ public class AccessRequest extends VersionedEntity {
     @Column(name = "operation")
     private AccessRequestOperation operation;
 
+    @Column(name = "requester_type")
+    private String requesterType;
+
+    @Column(name = "requester_identifier")
+    private String requesterIdentifier;
+
     @Column(name = "reviewer_identifier")
     private String reviewerIdentifier;
 
@@ -160,5 +166,21 @@ public class AccessRequest extends VersionedEntity {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public String getRequesterType() {
+        return requesterType;
+    }
+
+    public void setRequesterType(String requesterType) {
+        this.requesterType = requesterType;
+    }
+
+    public String getRequesterIdentifier() {
+        return requesterIdentifier;
+    }
+
+    public void setRequesterIdentifier(String requesterIdentifier) {
+        this.requesterIdentifier = requesterIdentifier;
     }
 }

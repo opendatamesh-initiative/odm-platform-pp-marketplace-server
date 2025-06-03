@@ -16,7 +16,7 @@ odm:
   utility-plane:
     marketplace-executors:
       - name: EXEC-001
-        address: http://localhost:8080
+        address: http://localhost:9019
         active: true
       - name: EXEC-002
         address: http://localhost:8082
