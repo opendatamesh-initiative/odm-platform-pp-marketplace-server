@@ -13,6 +13,8 @@ public interface ExecutorResultReceivedEventMapper {
     @Mapping(target = "properties", expression = "java(stringToProperties(entity.getProperties()))")
     ExecutorResultReceivedEvent.ExecutorResultReceivedEventAccessRequest toEventAccessRequest(AccessRequest entity);
 
+    @Mapping(target = "provider.dataProductFqn", source = "providerDataProductFqn")
+    @Mapping(target = "provider.dataProductPortsFqn", source = "providerDataProductPortsFqn")
     ExecutorResultReceivedEvent.ExecutorResultReceivedEventExecutorResponse toEventExecutorResponse(ExecutorResponse entity);
 
     default ObjectNode stringToProperties(String properties) {
