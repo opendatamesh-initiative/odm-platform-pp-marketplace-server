@@ -43,7 +43,7 @@ class AccessRequestSubmitter implements UseCase {
             validateCommand();
             transactionalOutboundPort.doInTransaction(() -> {
                 if (persistencyOutputPort.accessRequestAlreadyExists(command.getAccessRequest().getIdentifier())) {
-                    throw new BadRequestException("Access request already exists with identifier: " + command.getAccessRequest().getConsumerIdentifier());
+                    throw new BadRequestException("Access request already exists with identifier: " + command.getAccessRequest().getIdentifier());
                 }
 
                 AccessRequest accessRequest = persistencyOutputPort.createAccessRequest(command.getAccessRequest());
