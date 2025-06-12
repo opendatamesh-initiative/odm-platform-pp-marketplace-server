@@ -80,11 +80,7 @@ public class AccessRequestsService extends GenericMappedAndFilteredCrudServiceIm
             throw new BadRequestException("Start date is required");
         }
 
-        if (accessRequest.getEndDate() == null) {
-            throw new BadRequestException("End date is required");
-        }
-
-        if (!accessRequest.getStartDate().before(accessRequest.getEndDate())) {
+        if (accessRequest.getEndDate() != null && !accessRequest.getStartDate().before(accessRequest.getEndDate())) {
             throw new BadRequestException("Start date must be before end date");
         }
     }
