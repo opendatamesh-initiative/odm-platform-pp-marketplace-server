@@ -197,7 +197,8 @@ public class ExecutorResultReceivedEvent {
         public enum ExecutorResultReceivedEventAccessRequestConsumerType {
             USER,
             TEAM,
-            DATA_PRODUCT
+            DATA_PRODUCT,
+            APPLICATION
         }
     }
 
