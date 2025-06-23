@@ -8,6 +8,8 @@ import java.util.List;
 @Schema(description = "Marketplace Executor Response Resource")
 public class MarketplaceExecutorResponseRes extends VersionedRes {
 
+    @Schema(description = "Unique identifier of the executor response", example = "1")
+    private Long id;
     @Schema(description = "Identifier of the access request this response is for", example = "AR-123")
     private String accessRequestIdentifier;
     @Schema(description = "Status of the executor response", example = "GRANTED")
@@ -21,6 +23,13 @@ public class MarketplaceExecutorResponseRes extends VersionedRes {
         //DO NOTHING
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getAccessRequestIdentifier() {
         return accessRequestIdentifier;

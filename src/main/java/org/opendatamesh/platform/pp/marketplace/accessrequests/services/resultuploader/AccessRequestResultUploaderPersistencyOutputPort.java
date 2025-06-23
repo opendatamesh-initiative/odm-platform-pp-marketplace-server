@@ -3,11 +3,9 @@ package org.opendatamesh.platform.pp.marketplace.accessrequests.services.resultu
 import org.opendatamesh.platform.pp.marketplace.accessrequests.entities.AccessRequest;
 import org.opendatamesh.platform.pp.marketplace.accessrequests.entities.ExecutorResponse;
 
-import java.util.Optional;
-
 interface AccessRequestResultUploaderPersistencyOutputPort {
 
-    Optional<AccessRequest> findAccessRequest(String accessRequestIdentifier);
+    AccessRequest findAccessRequest(String accessRequestUuid);
 
     void saveExecutorResponse(ExecutorResponse executorResponse);
 

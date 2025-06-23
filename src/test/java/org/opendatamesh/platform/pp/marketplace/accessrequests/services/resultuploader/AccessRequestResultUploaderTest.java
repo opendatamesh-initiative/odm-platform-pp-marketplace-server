@@ -14,7 +14,6 @@ import org.opendatamesh.platform.pp.marketplace.utils.usecases.TransactionalOutb
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -30,7 +29,7 @@ public class AccessRequestResultUploaderTest {
     private TransactionalOutboundPort transactionalOutboundPort;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         lenient().doAnswer(invocation -> {
             Runnable runnable = invocation.getArgument(0);
             runnable.run();
@@ -76,7 +75,7 @@ public class AccessRequestResultUploaderTest {
                 transactionalOutboundPort
         );
 
-        when(persistencyOutputPort.findAccessRequest(any())).thenReturn(Optional.of(accessRequest));
+        when(persistencyOutputPort.findAccessRequest(any())).thenReturn(accessRequest);
 
         // Execute
         uploader.execute();
@@ -154,7 +153,7 @@ public class AccessRequestResultUploaderTest {
                 transactionalOutboundPort
         );
 
-        when(persistencyOutputPort.findAccessRequest(any())).thenReturn(Optional.empty());
+        when(persistencyOutputPort.findAccessRequest(any())).thenThrow(new NotFoundException("Test exception"));
 
         // Execute
         uploader.execute();
@@ -179,7 +178,7 @@ public class AccessRequestResultUploaderTest {
                 transactionalOutboundPort
         );
 
-        when(persistencyOutputPort.findAccessRequest(any())).thenReturn(Optional.of(accessRequest));
+        when(persistencyOutputPort.findAccessRequest(any())).thenReturn(accessRequest);
 
         // Execute
         uploader.execute();
@@ -204,7 +203,7 @@ public class AccessRequestResultUploaderTest {
                 transactionalOutboundPort
         );
 
-        when(persistencyOutputPort.findAccessRequest(any())).thenReturn(Optional.of(accessRequest));
+        when(persistencyOutputPort.findAccessRequest(any())).thenReturn(accessRequest);
 
         // Execute
         uploader.execute();

@@ -58,13 +58,13 @@ public class AccessRequestsUtilsService {
         return requestResult;
     }
 
-    public void uploadAccessRequestResult(String accessRequestIdentifier, MarketplaceExecutorResponseRes response) {
+    public void uploadAccessRequestResult(String accessRequestUuid, MarketplaceExecutorResponseRes response) {
         ExecutorResponse executorResponse = executorResponseMapper.toEntity(response);
 
         ExecutorResultReceivedEvent executorResultEvent = new ExecutorResultReceivedEvent();
         executorResultEvent.setAfterState(new ExecutorResultReceivedEvent.ExecutorResultReceivedEventState());
 
-        AccessRequestResultUploaderCommand command = new AccessRequestResultUploaderCommand(accessRequestIdentifier, executorResponse);
+        AccessRequestResultUploaderCommand command = new AccessRequestResultUploaderCommand(accessRequestUuid, executorResponse);
         AccessRequestResultUploaderPresenter presenter = buildExecutorResultUploaderPresenter(executorResultEvent);
         //Upload the results
         resultUploaderFactory.buildAccessRequestResultUploader(

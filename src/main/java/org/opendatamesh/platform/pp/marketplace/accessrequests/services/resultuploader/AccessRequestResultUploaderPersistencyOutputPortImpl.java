@@ -4,10 +4,6 @@ import org.opendatamesh.platform.pp.marketplace.accessrequests.entities.AccessRe
 import org.opendatamesh.platform.pp.marketplace.accessrequests.entities.ExecutorResponse;
 import org.opendatamesh.platform.pp.marketplace.accessrequests.services.core.AccessRequestsService;
 import org.opendatamesh.platform.pp.marketplace.accessrequests.services.core.ExecutorResponsesService;
-import org.opendatamesh.platform.pp.marketplace.rest.v1.resources.accessrequests.AccessRequestSearchOptions;
-import org.springframework.data.domain.Pageable;
-
-import java.util.Optional;
 
 class AccessRequestResultUploaderPersistencyOutputPortImpl implements AccessRequestResultUploaderPersistencyOutputPort {
 
@@ -20,10 +16,8 @@ class AccessRequestResultUploaderPersistencyOutputPortImpl implements AccessRequ
     }
 
     @Override
-    public Optional<AccessRequest> findAccessRequest(String accessRequestIdentifier) {
-        AccessRequestSearchOptions filter = new AccessRequestSearchOptions();
-        filter.setIdentifier(accessRequestIdentifier);
-        return accessRequestsService.findAllFiltered(Pageable.ofSize(1), filter).stream().findFirst();
+    public AccessRequest findAccessRequest(String accessRequestUuid) {
+        return accessRequestsService.findOne(accessRequestUuid);
     }
 
     @Override

@@ -12,6 +12,7 @@ import org.opendatamesh.platform.pp.marketplace.utils.services.GenericMappedAndF
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +62,14 @@ public class ExecutorResponsesService extends GenericMappedAndFilteredCrudServic
     @Override
     protected Specification<ExecutorResponse> getSpecFromFilters(ExecutorResponseSearchOptions filters) {
         List<Specification<ExecutorResponse>> specs = new ArrayList<>();
+        if(filters != null) {
+            if(StringUtils.hasText(filters.getAccessRequestIdentifier())) {
+                specs.add(ExecutorResponseRepository.Specs.hasAccessRequestIdentifier(filters.getAccessRequestIdentifier()));
+            }
+            if(StringUtils.hasText(filters.getAccessRequestUuid())) {
+                specs.add(ExecutorResponseRepository.Specs.hasAccessRequestUuid(filters.getAccessRequestUuid()));
+            }
+        }
         return SpecsUtils.combineWithAnd(specs);
     }
 } 

@@ -13,9 +13,10 @@ class AccessRequestSubmitterPersistencyOutputPortImpl implements AccessRequestSu
     }
 
     @Override
-    public boolean accessRequestAlreadyExists(String identifier) {
+    public boolean accessRequestAlreadyExists(String identifier, AccessRequest.AccessRequestOperation operation) {
         AccessRequestSearchOptions filter = new AccessRequestSearchOptions();
         filter.setIdentifier(identifier);
+        filter.setOperation(operation);
         return accessRequestsService.findAllFiltered(Pageable.ofSize(1), filter).hasContent();
     }
 

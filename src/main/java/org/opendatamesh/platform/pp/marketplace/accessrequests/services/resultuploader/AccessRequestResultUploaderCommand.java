@@ -6,8 +6,8 @@ public class AccessRequestResultUploaderCommand {
     private final String accessRequestIdentifier;
     private final ExecutorResponse executorResponse;
 
-    public AccessRequestResultUploaderCommand(String accessRequestIdentifier, ExecutorResponse executorResponse) {
-        this.accessRequestIdentifier = accessRequestIdentifier;
+    public AccessRequestResultUploaderCommand(String accessRequestUuid, ExecutorResponse executorResponse) {
+        this.accessRequestIdentifier = accessRequestUuid;
         this.executorResponse = executorResponse;
     }
 
@@ -15,7 +15,7 @@ public class AccessRequestResultUploaderCommand {
         return executorResponse;
     }
 
-    public String getAccessRequestIdentifier() {
+    public String getAccessRequestUuid() {
         return accessRequestIdentifier;
     }
 }

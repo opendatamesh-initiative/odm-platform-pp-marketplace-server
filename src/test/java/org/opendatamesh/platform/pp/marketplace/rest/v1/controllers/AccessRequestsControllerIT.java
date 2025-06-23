@@ -268,7 +268,7 @@ public class AccessRequestsControllerIT extends MarketplaceApplicationIT {
 
         // Create executor response
         MarketplaceExecutorResponseRes executorResponse = new MarketplaceExecutorResponseRes();
-        executorResponse.setAccessRequestIdentifier(accessRequest.getIdentifier());
+        executorResponse.setAccessRequestIdentifier(uuid);
         executorResponse.setStatus(MarketplaceExecutorResponseRes.ExecutorResponseStatus.GRANTED);
         executorResponse.setMessage("Test success message");
         
@@ -284,7 +284,7 @@ public class AccessRequestsControllerIT extends MarketplaceApplicationIT {
 
         // Execute
         ResponseEntity<Void> response = rest.exchange(
-                apiUrl(RoutesV1.ACCESS_REQUESTS, "/" + accessRequest.getIdentifier() + "/results"),
+                apiUrl(RoutesV1.ACCESS_REQUESTS, "/" + executorResponse.getAccessRequestIdentifier() + "/results"),
                 HttpMethod.POST,
                 responseEntity,
                 Void.class

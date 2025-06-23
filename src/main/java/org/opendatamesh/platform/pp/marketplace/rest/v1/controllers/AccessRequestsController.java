@@ -112,7 +112,7 @@ public class AccessRequestsController {
     @PostMapping("/{identifier}/results")
     @ResponseStatus(HttpStatus.OK)
     public void handleExecutorResponse(
-            @Parameter(description = "Access request identifier", required = true)
+            @Parameter(description = "The Access Request uuid", required = true)
             @PathVariable("identifier") String identifier,
             @Parameter(description = "Executor response details", required = true)
             @RequestBody MarketplaceExecutorResponseRes response

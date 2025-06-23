@@ -36,8 +36,7 @@ class AccessRequestResultUploader implements UseCase {
         try {
             validateCommand();
             transactionalOutboundPort.doInTransaction(() -> {
-                AccessRequest accessRequest = persistencyOutputPort.findAccessRequest(command.getAccessRequestIdentifier())
-                        .orElseThrow(() -> new NotFoundException("Missing access request with identifier: " + command.getAccessRequestIdentifier()));
+                AccessRequest accessRequest = persistencyOutputPort.findAccessRequest(command.getAccessRequestUuid());
 
                 ExecutorResponse executorResponse = command.getExecutorResponse();
                 executorResponse.setAccessRequest(accessRequest);
@@ -75,7 +74,7 @@ class AccessRequestResultUploader implements UseCase {
         if (command.getExecutorResponse() == null) {
             throw new BadRequestException("Executor response cannot be null");
         }
-        if (command.getAccessRequestIdentifier() == null) {
+        if (command.getAccessRequestUuid() == null) {
             throw new BadRequestException("Access request identifier cannot be null");
         }
 

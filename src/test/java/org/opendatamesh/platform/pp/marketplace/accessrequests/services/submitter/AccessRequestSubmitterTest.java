@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Date;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,7 +68,7 @@ public class AccessRequestSubmitterTest {
                 transactionalOutboundPort
         );
 
-        when(persistencyOutputPort.accessRequestAlreadyExists(any())).thenReturn(false);
+        when(persistencyOutputPort.accessRequestAlreadyExists(any(), eq(command.getAccessRequest().getOperation()))).thenReturn(false);
         when(persistencyOutputPort.createAccessRequest(any())).thenReturn(accessRequest);
 
         MarketplaceExecutorConfig.MarketplaceExecutor executor = new MarketplaceExecutorConfig.MarketplaceExecutor();
@@ -80,7 +81,7 @@ public class AccessRequestSubmitterTest {
         submitter.execute();
 
         // Verify
-        verify(persistencyOutputPort).accessRequestAlreadyExists(accessRequest.getIdentifier());
+        verify(persistencyOutputPort).accessRequestAlreadyExists(accessRequest.getIdentifier(), command.getAccessRequest().getOperation());
         verify(persistencyOutputPort).createAccessRequest(accessRequest);
         verify(executorOutputPort).submitRequest(executor.getAddress(), accessRequest);
         verify(presenter).presentAccessRequest(accessRequest);
@@ -188,13 +189,13 @@ public class AccessRequestSubmitterTest {
                 transactionalOutboundPort
         );
 
-        when(persistencyOutputPort.accessRequestAlreadyExists(any())).thenReturn(true);
+        when(persistencyOutputPort.accessRequestAlreadyExists(any(), eq(command.getAccessRequest().getOperation()))).thenReturn(true);
 
         // Execute
         submitter.execute();
 
         // Verify
-        verify(persistencyOutputPort).accessRequestAlreadyExists(accessRequest.getIdentifier());
+        verify(persistencyOutputPort).accessRequestAlreadyExists(accessRequest.getIdentifier(), command.getAccessRequest().getOperation());
         verify(persistencyOutputPort, never()).createAccessRequest(any());
         verify(executorOutputPort, never()).submitRequest(any(), any());
     }
@@ -214,7 +215,7 @@ public class AccessRequestSubmitterTest {
                 transactionalOutboundPort
         );
 
-        when(persistencyOutputPort.accessRequestAlreadyExists(any())).thenReturn(false);
+        when(persistencyOutputPort.accessRequestAlreadyExists(any(), eq(command.getAccessRequest().getOperation()))).thenReturn(false);
         when(persistencyOutputPort.createAccessRequest(any())).thenReturn(accessRequest);
 
         MarketplaceExecutorConfig.MarketplaceExecutor executor = new MarketplaceExecutorConfig.MarketplaceExecutor();
@@ -228,7 +229,7 @@ public class AccessRequestSubmitterTest {
         submitter.execute();
 
         // Verify
-        verify(persistencyOutputPort).accessRequestAlreadyExists(accessRequest.getIdentifier());
+        verify(persistencyOutputPort).accessRequestAlreadyExists(accessRequest.getIdentifier(), command.getAccessRequest().getOperation());
         verify(persistencyOutputPort).createAccessRequest(accessRequest);
         verify(executorOutputPort).submitRequest(executor.getAddress(), accessRequest);
         verify(presenter).presentClientException(any(ClientException.class));

@@ -30,7 +30,10 @@ class AccessRequestSubmitterExecutorOutputPortImpl implements AccessRequestSubmi
         
         MarketplaceExecutorRequestRes.RequestInfo requestInfo = new MarketplaceExecutorRequestRes.RequestInfo();
         requestInfo.setName(accessRequest.getName());
-        requestInfo.setIdentifier(accessRequest.getIdentifier());
+        //Setting the internal uuid of the access request
+        //This is done because the access request identifier is not unique
+        //(the natural key is the identifier and the operation)
+        requestInfo.setIdentifier(accessRequest.getUuid());
         
         // Set provider info
         MarketplaceExecutorRequestRes.ProviderInfo providerInfo = new MarketplaceExecutorRequestRes.ProviderInfo();

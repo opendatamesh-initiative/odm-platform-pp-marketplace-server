@@ -96,6 +96,9 @@ public class AccessRequestsService extends GenericMappedAndFilteredCrudServiceIm
         if(StringUtils.hasText(filters.getIdentifier())){
             specs.add(AccessRequestRepository.Specs.hasIdentifier(filters.getIdentifier()));
         }
+        if(filters.getOperation() != null){
+            specs.add(AccessRequestRepository.Specs.hasOperation(filters.getOperation()));
+        }
         return SpecsUtils.combineWithAnd(specs);
     }
 }

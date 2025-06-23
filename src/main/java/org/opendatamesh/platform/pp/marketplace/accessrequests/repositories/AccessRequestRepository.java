@@ -14,5 +14,9 @@ public interface AccessRequestRepository extends PagingAndSortingAndSpecificatio
         public static Specification<AccessRequest> hasIdentifier(String identifier) {
             return (root, query, cb) -> cb.equal(root.get(AccessRequest_.identifier), identifier);
         }
+
+        public static Specification<AccessRequest> hasOperation(AccessRequest.AccessRequestOperation operation) {
+            return (root, query, cb) -> cb.equal(root.get(AccessRequest_.operation), operation);
+        }
     }
 } 
