@@ -7,7 +7,7 @@
 
     <groupId>org.opendatamesh</groupId>
     <artifactId>odm-platform-pp-marketplace-server</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
     <url>https://github.com/opendatamesh-initiative/odm-platform-pp-marketplace-server</url>
     <packaging>jar</packaging>
 
@@ -205,14 +205,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>2.7.13</version>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>com.h2database</groupId>
-                            <artifactId>h2</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
                 <executions>
                     <execution>
                         <goals>
