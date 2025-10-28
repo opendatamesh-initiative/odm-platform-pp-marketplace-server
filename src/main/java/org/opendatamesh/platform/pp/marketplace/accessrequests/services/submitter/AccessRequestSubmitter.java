@@ -50,7 +50,7 @@ class AccessRequestSubmitter implements UseCase {
                 AtomicBoolean requestHandled = new AtomicBoolean(false);
                 for (MarketplaceExecutor executor : executorOutputPort.getExecutorsConfig()) {
                     if (executor.isActive()) {
-                        submitRequestToExecutor(executor, requestHandled);
+                        submitRequestToExecutor(executor, requestHandled, accessRequest);
                     }
                 }
                 if (!requestHandled.get()) {
@@ -82,11 +82,11 @@ class AccessRequestSubmitter implements UseCase {
         }
     }
 
-    private void submitRequestToExecutor(MarketplaceExecutor executor, AtomicBoolean requestHandled) {
+    private void submitRequestToExecutor(MarketplaceExecutor executor, AtomicBoolean requestHandled, AccessRequest savedAccessRequest) {
         try {
-            executorOutputPort.submitRequest(executor.getAddress(), command.getAccessRequest());
+            executorOutputPort.submitRequest(executor.getAddress(), savedAccessRequest);
             requestHandled.set(true);
-            logger.info("Request {} handled by executor: {}", command.getAccessRequest().getIdentifier(), executor.getName());
+            logger.info("Request {} handled by executor: {}", savedAccessRequest.getIdentifier(), executor.getName());
         } catch (ClientException | ClientResourceMappingException e) {
             logger.warn(e.getMessage(), e);
             presenter.presentClientException(e);

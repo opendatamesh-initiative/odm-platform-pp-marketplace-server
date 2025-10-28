@@ -14,6 +14,7 @@ import org.opendatamesh.platform.pp.marketplace.utils.usecases.TransactionalOutb
 import java.util.Collections;
 import java.util.Date;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -233,5 +234,50 @@ public class AccessRequestSubmitterTest {
         verify(persistencyOutputPort).createAccessRequest(accessRequest);
         verify(executorOutputPort).submitRequest(executor.getAddress(), accessRequest);
         verify(presenter).presentClientException(any(ClientException.class));
+    }
+
+    @Test
+    void testExecutePassesCorrectUuidToExecutor() {
+        // Setup - Create a request with a user-provided UUID
+        AccessRequest originalRequest = createTestAccessRequest();
+        originalRequest.setUuid("user-provided-uuid-123");
+        
+        // Create a new request that simulates what the database would return with a generated UUID
+        AccessRequest savedRequest = createTestAccessRequest();
+        savedRequest.setUuid("generated-uuid-456"); // This is what the database generates
+        
+        AccessRequestSubmitterCommand command = new AccessRequestSubmitterCommand();
+        command.setAccessRequest(originalRequest);
+
+        AccessRequestSubmitter submitter = new AccessRequestSubmitter(
+                presenter,
+                command,
+                persistencyOutputPort,
+                executorOutputPort,
+                transactionalOutboundPort
+        );
+
+        when(persistencyOutputPort.accessRequestAlreadyExists(any(), eq(command.getAccessRequest().getOperation()))).thenReturn(false);
+        when(persistencyOutputPort.createAccessRequest(originalRequest)).thenReturn(savedRequest);
+
+        MarketplaceExecutorConfig.MarketplaceExecutor executor = new MarketplaceExecutorConfig.MarketplaceExecutor();
+        executor.setName("test-executor");
+        executor.setAddress("http://test-executor");
+        executor.setActive(true);
+        when(executorOutputPort.getExecutorsConfig()).thenReturn(Collections.singletonList(executor));
+
+        // Execute
+        submitter.execute();
+
+        // Verify that the executor receives the SAVED request (with generated UUID), not the original one
+        verify(persistencyOutputPort).accessRequestAlreadyExists(originalRequest.getIdentifier(), originalRequest.getOperation());
+        verify(persistencyOutputPort).createAccessRequest(originalRequest);
+        verify(executorOutputPort).submitRequest(executor.getAddress(), savedRequest); // Should receive savedRequest, not originalRequest
+        verify(presenter).presentAccessRequest(savedRequest);
+        
+        // Verify that the saved request has the generated UUID
+        assertNotNull(savedRequest.getUuid());
+        assertEquals("generated-uuid-456", savedRequest.getUuid());
+        assertNotEquals(originalRequest.getUuid(), savedRequest.getUuid());
     }
 } 
