@@ -1,11 +1,14 @@
 package org.opendatamesh.platform.pp.marketplace.accessrequests.services.submitter;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opendatamesh.platform.pp.marketplace.accessrequests.entities.AccessRequest;
 import org.opendatamesh.platform.pp.marketplace.client.ExecutorClient;
 import org.opendatamesh.platform.pp.marketplace.configuration.executor.MarketplaceExecutorConfig;
 import org.opendatamesh.platform.pp.marketplace.rest.v1.resources.executors.MarketplaceExecutorRequestRes;
 
 import java.util.List;
+import java.util.Map;
 
 class AccessRequestSubmitterExecutorOutputPortImpl implements AccessRequestSubmitterExecutorOutputPort {
 
@@ -35,6 +38,9 @@ class AccessRequestSubmitterExecutorOutputPortImpl implements AccessRequestSubmi
         //(the natural key is the identifier and the operation)
         requestInfo.setIdentifier(accessRequest.getUuid());
         
+        // Set properties
+        requestInfo.setProperties(stringToPropertiesMap(accessRequest.getProperties()));
+        
         // Set provider info
         MarketplaceExecutorRequestRes.ProviderInfo providerInfo = new MarketplaceExecutorRequestRes.ProviderInfo();
         providerInfo.setDataProductFqn(accessRequest.getProviderDataProductFqn());
@@ -59,5 +65,17 @@ class AccessRequestSubmitterExecutorOutputPortImpl implements AccessRequestSubmi
         
         executorRequest.setRequest(requestInfo);
         executorClient.postRequest(executorBaseUrl, executorRequest);
+    }
+
+    private Map<String, Object> stringToPropertiesMap(String properties) {
+        if (properties == null || properties.isEmpty()) {
+            return null;
+        }
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(properties, new TypeReference<Map<String, Object>>() {});
+        } catch (Exception e) {
+            throw new RuntimeException("Error converting string to properties map", e);
+        }
     }
 } 
