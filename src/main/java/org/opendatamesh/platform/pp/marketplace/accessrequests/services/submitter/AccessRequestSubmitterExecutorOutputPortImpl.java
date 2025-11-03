@@ -1,14 +1,21 @@
 package org.opendatamesh.platform.pp.marketplace.accessrequests.services.submitter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opendatamesh.platform.pp.marketplace.accessrequests.entities.AccessRequest;
 import org.opendatamesh.platform.pp.marketplace.client.ExecutorClient;
 import org.opendatamesh.platform.pp.marketplace.configuration.executor.MarketplaceExecutorConfig;
 import org.opendatamesh.platform.pp.marketplace.rest.v1.resources.executors.MarketplaceExecutorRequestRes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 
 class AccessRequestSubmitterExecutorOutputPortImpl implements AccessRequestSubmitterExecutorOutputPort {
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final MarketplaceExecutorConfig executorConfig;
     private final ExecutorClient executorClient;
 
@@ -35,6 +42,9 @@ class AccessRequestSubmitterExecutorOutputPortImpl implements AccessRequestSubmi
         //(the natural key is the identifier and the operation)
         requestInfo.setIdentifier(accessRequest.getUuid());
         
+        // Set properties
+        requestInfo.setProperties(stringToPropertiesMap(accessRequest.getProperties()));
+        
         // Set provider info
         MarketplaceExecutorRequestRes.ProviderInfo providerInfo = new MarketplaceExecutorRequestRes.ProviderInfo();
         providerInfo.setDataProductFqn(accessRequest.getProviderDataProductFqn());
@@ -59,5 +69,19 @@ class AccessRequestSubmitterExecutorOutputPortImpl implements AccessRequestSubmi
         
         executorRequest.setRequest(requestInfo);
         executorClient.postRequest(executorBaseUrl, executorRequest);
+    }
+
+    private Map<String, Object> stringToPropertiesMap(String properties) {
+        if (properties == null || properties.isEmpty()) {
+            return null;
+        }
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(properties, new TypeReference<Map<String, Object>>() {});
+        } catch (JsonProcessingException e) {
+            logger.warn("Error converting string to properties map: {}", e.getMessage(), e);
+        }
+        // If the conversion fails, return null
+        return null;
     }
 } 
