@@ -7,7 +7,7 @@
 
     <groupId>org.opendatamesh</groupId>
     <artifactId>odm-platform-pp-marketplace-server</artifactId>
-    <version>0.1.4</version>
+    <version>0.1.5</version>
     <url>https://github.com/opendatamesh-initiative/odm-platform-pp-marketplace-server</url>
     <packaging>jar</packaging>
 
