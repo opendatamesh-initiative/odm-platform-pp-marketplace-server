@@ -1,17 +1,21 @@
 package org.opendatamesh.platform.pp.marketplace.accessrequests.services.submitter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opendatamesh.platform.pp.marketplace.accessrequests.entities.AccessRequest;
 import org.opendatamesh.platform.pp.marketplace.client.ExecutorClient;
 import org.opendatamesh.platform.pp.marketplace.configuration.executor.MarketplaceExecutorConfig;
 import org.opendatamesh.platform.pp.marketplace.rest.v1.resources.executors.MarketplaceExecutorRequestRes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
 class AccessRequestSubmitterExecutorOutputPortImpl implements AccessRequestSubmitterExecutorOutputPort {
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final MarketplaceExecutorConfig executorConfig;
     private final ExecutorClient executorClient;
 
@@ -74,8 +78,10 @@ class AccessRequestSubmitterExecutorOutputPortImpl implements AccessRequestSubmi
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(properties, new TypeReference<Map<String, Object>>() {});
-        } catch (Exception e) {
-            throw new RuntimeException("Error converting string to properties map", e);
+        } catch (JsonProcessingException e) {
+            logger.warn("Error converting string to properties map: {}", e.getMessage(), e);
         }
+        // If the conversion fails, return null
+        return null;
     }
 } 
