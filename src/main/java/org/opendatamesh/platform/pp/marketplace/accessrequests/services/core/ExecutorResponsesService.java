@@ -62,8 +62,6 @@ public class ExecutorResponsesService extends GenericMappedAndFilteredCrudServic
     @Override
     protected void reconcile(ExecutorResponse executorResponse) {
         executorResponse.setAccessRequest(accessRequestsService.findOne(executorResponse.getAccessRequest().getUuid()));
-        //Setting this for retro-compatibility.
-        executorResponse.setAccessRequestIdentifier(executorResponse.getAccessRequest().getIdentifier());
     }
 
     @Override

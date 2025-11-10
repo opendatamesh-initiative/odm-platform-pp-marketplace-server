@@ -15,7 +15,7 @@ public interface ExecutorResponseRepository extends PagingAndSortingAndSpecifica
     class Specs extends SpecsUtils {
 
         public static Specification<ExecutorResponse> hasAccessRequestIdentifier(String accessRequestIdentifier) {
-            return (root, query, cb) -> cb.equal(root.get(ExecutorResponse_.accessRequestIdentifier), accessRequestIdentifier);
+            return (root, query, cb) -> cb.equal(root.get(ExecutorResponse_.accessRequest).get(AccessRequest_.identifier), accessRequestIdentifier);
         }
 
         public static Specification<ExecutorResponse> hasAccessRequestUuid(String accessRequestUuid) {

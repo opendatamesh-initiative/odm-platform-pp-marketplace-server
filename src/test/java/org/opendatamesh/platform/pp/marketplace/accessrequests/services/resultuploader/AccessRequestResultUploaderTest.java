@@ -53,7 +53,6 @@ public class AccessRequestResultUploaderTest {
 
     private ExecutorResponse createTestExecutorResponse() {
         ExecutorResponse executorResponse = new ExecutorResponse();
-        executorResponse.setAccessRequestIdentifier("test-request-1");
         executorResponse.setStatus(ExecutorResponse.ExecutorResponseStatus.GRANTED);
         executorResponse.setMessage("Test success message");
         executorResponse.setProviderDataProductFqn("test-product");

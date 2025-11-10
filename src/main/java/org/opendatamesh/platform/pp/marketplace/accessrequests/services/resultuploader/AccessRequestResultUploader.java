@@ -40,7 +40,6 @@ class AccessRequestResultUploader implements UseCase {
 
                 ExecutorResponse executorResponse = command.getExecutorResponse();
                 executorResponse.setAccessRequest(accessRequest);
-                executorResponse.setAccessRequestIdentifier(accessRequest.getIdentifier());
                 verifyResponseContainsCorrectProviderFqns(accessRequest, executorResponse);
 
                 persistencyOutputPort.saveExecutorResponse(executorResponse);
