@@ -29,10 +29,10 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:opendatamesh-initiative/odm-platform-adapter-observer-blindata</connection>
-        <developerConnection>scm:git:git@github.com:opendatamesh-initiative/odm-platform-adapter-observer-blindata
+        <connection>scm:git:git@github.com:opendatamesh-initiative/odm-platform-pp-marketplace-server</connection>
+        <developerConnection>scm:git:git@github.com:opendatamesh-initiative/odm-platform-pp-marketplace-server
         </developerConnection>
-        <url>scm:git:git@github.com:opendatamesh-initiative/odm-platform-adapter-observer-blindata</url>
+        <url>scm:git:git@github.com:opendatamesh-initiative/odm-platform-pp-marketplace-server</url>
     </scm>
 
     <distributionManagement>
@@ -228,7 +228,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>2.7.13</version>
                 <configuration>
-                  <layout>ZIP</layout>
+                    <layout>ZIP</layout>
                 </configuration>
                 <executions>
                     <execution>
