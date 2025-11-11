@@ -203,7 +203,7 @@ spring:
   jpa:
     properties:
       hibernate:
-        default_schema: marketplace_data              # Default schema for database tables
+        default_schema: odm_marketplace              # Default schema for database tables
 ```
 
 #### Flyway Database Migration
@@ -213,7 +213,6 @@ spring:
   flyway:
     baselineOnMigrate: true                           # Allow baseline migrations
     locations: classpath:db/migration/postgresql      # Location of migration scripts
-    schemas: public                                   # Target schema for migrations
     validateOnMigrate: false                          # Skip validation during migration
     outOfOrder: true                                  # Allow out-of-order migrations
 ```
@@ -253,7 +252,7 @@ environment variable. Here's an example:
 
 ```bash
 docker run -p 8080:8080 \
-  -e SPRING_PROPS='{"spring":{"datasource":{"url":"jdbc:postgresql://db:5432/marketplace","username":"your_username","password":"your_password"},"jpa":{"properties":{"hibernate":{"default_schema":"marketplace_data"}}}},"odm":{"product-plane":{"notification-service":{"address":"http://notification-service:8083","active":true}},"utility-plane":{"marketplace-executors":[{"name":"EXEC-001","address":"http://executor:8080","active":true}]}}}' \
+  -e SPRING_PROPS='{"spring":{"datasource":{"url":"jdbc:postgresql://db:5432/marketplace","username":"your_username","password":"your_password"},"jpa":{"properties":{"hibernate":{"default_schema":"odm_marketplace"}}}},"odm":{"product-plane":{"notification-service":{"address":"http://notification-service:8083","active":true}},"utility-plane":{"marketplace-executors":[{"name":"EXEC-001","address":"http://executor:8080","active":true}]}}}' \
   odm-marketplace-server
 ```
 
@@ -270,7 +269,7 @@ The JSON structure follows the same hierarchy as the YAML configuration:
     "jpa": {
       "properties": {
         "hibernate": {
-          "default_schema": "marketplace_data"
+          "default_schema": "odm_marketplace"
         }
       }
     }

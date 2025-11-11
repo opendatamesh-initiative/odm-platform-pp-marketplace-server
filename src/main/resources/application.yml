@@ -14,7 +14,7 @@ spring:
   jpa:
     properties:
       hibernate:
-        default_schema: ODM_MARKETPLACE
+        default_schema: odm_marketplace
         ddl-auto: validate
 
 info:

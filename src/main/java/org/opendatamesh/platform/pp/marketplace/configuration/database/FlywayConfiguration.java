@@ -23,7 +23,7 @@ public class FlywayConfiguration {
     @Autowired
     private DataSource dataSource;
 
-    @Value("${spring.jpa.properties.hibernate.default_schema:ODM_MARKETPLACE}")
+    @Value("${spring.jpa.properties.hibernate.default_schema:odm_marketplace}")
     private String defaultSchema;
 
     @Bean
