@@ -206,6 +206,8 @@ spring:
         default_schema: odm_marketplace              # Default schema for database tables
 ```
 
+> **Note:** The default schema name should always be lowercase. Using uppercase or mixed-case schema names may cause issues with database migrations and queries.
+
 #### Flyway Database Migration
 
 ```yaml

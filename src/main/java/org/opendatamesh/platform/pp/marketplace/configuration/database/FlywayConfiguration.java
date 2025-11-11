@@ -23,17 +23,21 @@ public class FlywayConfiguration {
     @Autowired
     private DataSource dataSource;
 
-    @Value("${spring.jpa.properties.hibernate.default_schema:odm_marketplace}")
+    @Value("${spring.jpa.properties.hibernate.default_schema}")
     private String defaultSchema;
 
     @Bean
     public Flyway flyway() {
         logger.info("Initializing Flyway with schema: {}", defaultSchema);
+        if (!defaultSchema.toLowerCase().equals(defaultSchema)) {
+            throw new IllegalStateException("Default schema must contain lower cases only.");
+        }
+
         Flyway flyway = Flyway.configure()
-            .dataSource(dataSource)
-            .schemas(defaultSchema)
-            .locations(DB_MIGRATION_VENDOR.replace(VENDOR_PLACEHOLDER, readVendor()))
-            .load();
+                .dataSource(dataSource)
+                .schemas(defaultSchema)
+                .locations(DB_MIGRATION_VENDOR.replace(VENDOR_PLACEHOLDER, readVendor()))
+                .load();
         flyway.migrate();
         return flyway;
     }
