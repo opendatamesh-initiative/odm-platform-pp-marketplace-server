@@ -1,19 +1,14 @@
 package org.opendatamesh.platform.pp.marketplace.rest.v1.resources.executors;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.opendatamesh.platform.pp.marketplace.utils.resources.VersionedRes;
 
 import java.util.List;
 
 @Schema(description = "Marketplace Executor Response Resource")
-public class MarketplaceExecutorResponseRes extends VersionedRes {
+public class MarketplaceExecutorResponseUploadRes {
 
     @Schema(description = "Unique identifier of the executor response", example = "1")
     private Long id;
-    @Schema(description = "Identifier of the access request this response is for", example = "AR-123")
-    private String accessRequestIdentifier;
-    @Schema(description = "The internal marketplace service uuid of the access request this response is for")
-    private String accessRequestUuid;
     @Schema(description = "Status of the executor response", example = "GRANTED")
     private ExecutorResponseStatus status;
     @Schema(description = "Message from the executor", example = "Access request processed successfully")
@@ -21,7 +16,7 @@ public class MarketplaceExecutorResponseRes extends VersionedRes {
     @Schema(description = "Provider information")
     private ProviderInfo provider;
 
-    public MarketplaceExecutorResponseRes() {
+    public MarketplaceExecutorResponseUploadRes() {
         //DO NOTHING
     }
 
@@ -31,22 +26,6 @@ public class MarketplaceExecutorResponseRes extends VersionedRes {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getAccessRequestIdentifier() {
-        return accessRequestIdentifier;
-    }
-
-    public void setAccessRequestIdentifier(String accessRequestIdentifier) {
-        this.accessRequestIdentifier = accessRequestIdentifier;
-    }
-
-    public String getAccessRequestUuid() {
-        return accessRequestUuid;
-    }
-
-    public void setAccessRequestUuid(String accessRequestUuid) {
-        this.accessRequestUuid = accessRequestUuid;
     }
 
     public ExecutorResponseStatus getStatus() {

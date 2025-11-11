@@ -14,7 +14,7 @@ import org.opendatamesh.platform.pp.marketplace.rest.v1.resources.accessrequests
 import org.opendatamesh.platform.pp.marketplace.rest.v1.resources.events.ExecutorResultReceivedEvent;
 import org.opendatamesh.platform.pp.marketplace.rest.v1.resources.events.ExecutorResultReceivedEventMapper;
 import org.opendatamesh.platform.pp.marketplace.rest.v1.resources.executors.MarketplaceExecutorResponseMapper;
-import org.opendatamesh.platform.pp.marketplace.rest.v1.resources.executors.MarketplaceExecutorResponseRes;
+import org.opendatamesh.platform.pp.marketplace.rest.v1.resources.executors.MarketplaceExecutorResponseUploadRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +58,7 @@ public class AccessRequestsUtilsService {
         return requestResult;
     }
 
-    public void uploadAccessRequestResult(String accessRequestUuid, MarketplaceExecutorResponseRes response) {
+    public void uploadAccessRequestResult(String accessRequestUuid, MarketplaceExecutorResponseUploadRes response) {
         ExecutorResponse executorResponse = executorResponseMapper.toEntity(response);
 
         ExecutorResultReceivedEvent executorResultEvent = new ExecutorResultReceivedEvent();

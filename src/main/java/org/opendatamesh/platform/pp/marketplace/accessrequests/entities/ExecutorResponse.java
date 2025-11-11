@@ -18,6 +18,7 @@ public class ExecutorResponse extends VersionedEntity {
     @JoinColumn(name = "access_request_uuid")
     private AccessRequest accessRequest;
 
+    @Deprecated
     @Column(name = "access_request_identifier", nullable = false)
     private String accessRequestIdentifier;
 
@@ -49,14 +50,6 @@ public class ExecutorResponse extends VersionedEntity {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getAccessRequestIdentifier() {
-        return accessRequestIdentifier;
-    }
-
-    public void setAccessRequestIdentifier(String accessRequestIdentifier) {
-        this.accessRequestIdentifier = accessRequestIdentifier;
     }
 
     public ExecutorResponseStatus getStatus() {
@@ -98,7 +91,7 @@ public class ExecutorResponse extends VersionedEntity {
     public void setAccessRequest(AccessRequest accessRequest) {
         this.accessRequest = accessRequest;
         if (accessRequest != null) {
-            accessRequestIdentifier = accessRequest.getIdentifier();
+            this.accessRequestIdentifier = accessRequest.getIdentifier();
         }
     }
 

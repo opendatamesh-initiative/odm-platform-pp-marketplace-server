@@ -30,7 +30,6 @@ public class TestConfig {
     /**
      * Scans for all interfaces under the client packages and
      * registers a Mockito.mock(clazz) as a singleton bean for each.
-     * Excludes OdmEventNotificationClient since it's already configured in OdmEventNotificationClientConfigs.
      */
     @Bean
     public static BeanFactoryPostProcessor mockClientsRegistrar() {

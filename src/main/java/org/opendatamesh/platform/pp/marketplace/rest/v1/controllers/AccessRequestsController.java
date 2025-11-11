@@ -11,7 +11,7 @@ import org.opendatamesh.platform.pp.marketplace.accessrequests.services.AccessRe
 import org.opendatamesh.platform.pp.marketplace.accessrequests.services.core.AccessRequestsService;
 import org.opendatamesh.platform.pp.marketplace.rest.v1.resources.accessrequests.AccessRequestRes;
 import org.opendatamesh.platform.pp.marketplace.rest.v1.resources.accessrequests.AccessRequestSearchOptions;
-import org.opendatamesh.platform.pp.marketplace.rest.v1.resources.executors.MarketplaceExecutorResponseRes;
+import org.opendatamesh.platform.pp.marketplace.rest.v1.resources.executors.MarketplaceExecutorResponseUploadRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -109,14 +109,14 @@ public class AccessRequestsController {
             @ApiResponse(responseCode = "400", description = "Invalid response data"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @PostMapping("/{identifier}/results")
+    @PostMapping("/{uuid}/results")
     @ResponseStatus(HttpStatus.OK)
     public void handleExecutorResponse(
             @Parameter(description = "The Access Request uuid", required = true)
-            @PathVariable("identifier") String identifier,
+            @PathVariable("uuid") String uuid,
             @Parameter(description = "Executor response details", required = true)
-            @RequestBody MarketplaceExecutorResponseRes response
+            @RequestBody MarketplaceExecutorResponseUploadRes response
     ) {
-        utilsService.uploadAccessRequestResult(identifier, response);
+        utilsService.uploadAccessRequestResult(uuid, response);
     }
 }

@@ -3,6 +3,39 @@
 The Open Data Mesh Platform's Marketplace service server is a Spring Boot application that provides marketplace
 functionality for the Open Data Mesh Platform.
 
+<!-- TOC -->
+
+* [ODM Platform Marketplace Server](#odm-platform-marketplace-server)
+    * [Overview](#overview)
+    * [Core Functionalities](#core-functionalities)
+        * [Access Request Management](#access-request-management)
+    * [Prerequisites](#prerequisites)
+    * [Setup Instructions](#setup-instructions)
+        * [1. Database Configuration](#1-database-configuration)
+            * [PostgreSQL (Production)](#postgresql-production)
+            * [H2 (Development)](#h2-development)
+        * [2. Building the Project](#2-building-the-project)
+        * [3. Running the Application](#3-running-the-application)
+            * [Local Development](#local-development)
+            * [Docker Deployment](#docker-deployment)
+    * [Configuration Options](#configuration-options)
+        * [Application Properties](#application-properties)
+            * [Server Configuration](#server-configuration)
+            * [Spring Configuration](#spring-configuration)
+            * [Database Configuration](#database-configuration)
+            * [Flyway Database Migration](#flyway-database-migration)
+            * [ODM Platform Configuration](#odm-platform-configuration)
+            * [Logging Configuration](#logging-configuration)
+        * [Docker Spring JSON Configuration](#docker-spring-json-configuration)
+        * [Environment Variables](#environment-variables)
+    * [API Documentation](#api-documentation)
+    * [Contributing](#contributing)
+    * [License](#license)
+    * [Support](#support)
+    * [Acknowledgments](#acknowledgments)
+
+<!-- TOC -->
+
 ## Overview
 
 This service is part of the Open Data Mesh Platform initiative, providing marketplace capabilities for data products and
@@ -12,8 +45,58 @@ services.
 
 ### Access Request Management
 
-- Submit new access requests to the marketplace
-- Handle executor responses for access requests
+The marketplace server provides a complete workflow for managing access requests, from initial submission through
+executor processing to final response handling. The following sequence diagram illustrates the interaction flow:
+
+![](docs/InteractionDiagram.jpg)
+
+#### Access Request Submission Flow
+
+1. **External Service Submission**: An external service submits a new access request via
+   `POST /api/v1/pp/marketplace/requests/submit` with the access request details. The `identifier` field contains an
+   external identifier that can be used to reconcile the request with the external service.
+
+2. **Request Processing**: The marketplace server validates the request and checks for duplicates. If valid, the access
+   request is stored and assigned a unique UUID. It is recommended to use the marketplace's internal UUIDs to reference
+   access requests within the platform, as an access request's natural key is the combination of the external identifier
+   and the operation.
+
+3. **Executor Forwarding**: The marketplace server forwards the access request to one or more configured marketplace
+   executors. The system attempts to submit to active executors until one successfully accepts the request. The request
+   is sent as a `MarketplaceExecutorRequestRes` object, which contains the access request UUID in the
+   `request.identifier` field.
+
+4. **Response Return**: Upon successful submission to at least one executor, the marketplace server returns the created
+   access request (including its UUID) to the client with HTTP status 201 (Created).
+
+#### Executor Response Handling Flow
+
+1. **Response Reception**: After processing the access request, the executor sends its response back to the marketplace
+   server via `POST /api/v1/pp/marketplace/requests/{uuid}/results`, where `{uuid}` is the access request UUID that was
+   received during submission.
+
+2. **Response Processing**: The marketplace server validates that the response corresponds to the original access
+   request and stores the executor response.
+
+3. **Notification**: The marketplace server sends a notification event to the notification service to inform other
+   system components about the completed executor response.
+
+4. **Success Response**: The endpoint returns HTTP status 200 (OK) upon successful processing.
+
+#### API Endpoints
+
+- `POST /api/v1/pp/marketplace/requests/submit` - Submit a new access request
+- `POST /api/v1/pp/marketplace/requests/{uuid}/results` - Handle executor response for an access request
+- `GET /api/v1/pp/marketplace/requests/{id}` - Retrieve an access request by UUID
+- `GET /api/v1/pp/marketplace/requests` - Search and list access requests
+- `DELETE /api/v1/pp/marketplace/requests/{id}` - Delete an access request
+
+#### External System Interactions
+
+- **Marketplace Executors**: External services that process access requests. The marketplace server forwards requests to
+  executors and receives their responses.
+- **Notification Service**: External service that receives events when executor responses are processed, enabling other
+  system components to react to access request completions.
 
 ## Prerequisites
 
@@ -92,12 +175,14 @@ docker run -p 8080:8080 \
 The application can be configured using the following properties in `application.yml` or `application.properties`:
 
 #### Server Configuration
+
 ```yaml
 server:
   port: 8080  # The port on which the application will run
 ```
 
 #### Spring Configuration
+
 ```yaml
 spring:
   application:
@@ -108,6 +193,7 @@ spring:
 ```
 
 #### Database Configuration
+
 ```yaml
 spring:
   datasource:
@@ -121,6 +207,7 @@ spring:
 ```
 
 #### Flyway Database Migration
+
 ```yaml
 spring:
   flyway:
@@ -132,6 +219,7 @@ spring:
 ```
 
 #### ODM Platform Configuration
+
 ```yaml
 odm:
   product-plane:
@@ -139,13 +227,14 @@ odm:
       address: http://localhost:8083                  # Notification service URL
       active: true                                    # Enable/disable notification service
   utility-plane:
-    marketplace-executors:                            # List of marketplace executors
+    marketplace-executors: # List of marketplace executors
       - name: EXEC-001                               # Executor name
         address: http://localhost:8080               # Executor URL
         active: true                                 # Enable/disable executor
 ```
 
 #### Logging Configuration
+
 ```yaml
 logging:
   pattern:
@@ -159,7 +248,8 @@ These properties can be overridden using environment variables or command-line a
 
 ### Docker Spring JSON Configuration
 
-When running the application in Docker, you can pass the Spring configuration as a JSON string using the `SPRING_PROPS` environment variable. Here's an example:
+When running the application in Docker, you can pass the Spring configuration as a JSON string using the `SPRING_PROPS`
+environment variable. Here's an example:
 
 ```bash
 docker run -p 8080:8080 \
@@ -205,7 +295,8 @@ The JSON structure follows the same hierarchy as the YAML configuration:
 }
 ```
 
-This approach is particularly useful when you need to configure multiple properties at once in a Docker environment, as it allows you to pass all configuration in a single environment variable.
+This approach is particularly useful when you need to configure multiple properties at once in a Docker environment, as
+it allows you to pass all configuration in a single environment variable.
 
 ### Environment Variables
 

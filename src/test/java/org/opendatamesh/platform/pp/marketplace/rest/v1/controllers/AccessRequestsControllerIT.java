@@ -3,6 +3,8 @@ package org.opendatamesh.platform.pp.marketplace.rest.v1.controllers;
 import java.util.Arrays;
 import java.util.Date;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.opendatamesh.platform.pp.marketplace.rest.v1.MarketplaceApplicationIT;
@@ -30,6 +32,16 @@ public class AccessRequestsControllerIT extends MarketplaceApplicationIT {
 
     @Autowired
     private NotificationClient notificationClient;
+
+    @BeforeEach
+    void setUp() {
+        Mockito.reset(executorClient, notificationClient);
+    }
+
+    @AfterEach
+    void tearDown() {
+        Mockito.reset(executorClient, notificationClient);
+    }
 
     @Test
     void testSubmitAccessRequest() {
