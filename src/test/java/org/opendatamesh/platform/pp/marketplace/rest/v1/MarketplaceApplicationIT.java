@@ -11,7 +11,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import javax.annotation.PostConstruct;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TestConfig.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = {TestConfig.class, TestContainerConfig.class})
 @ActiveProfiles("test")
 public abstract class MarketplaceApplicationIT {
 
