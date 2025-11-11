@@ -6,10 +6,10 @@ import java.util.List;
 
 @Schema(description = "Search options for filtering executor responses")
 public class ExecutorResponseSearchOptions {
-    @Schema(description = "Filter by access request identifier", example = "AR-123")
+    @Schema(description = "Filter by the external access request identifier", example = "AR-123")
     private String accessRequestIdentifier;
 
-    @Schema(description = "Filter by access request UUID", example = "550e8400-e29b-41d4-a716-446655440000")
+    @Schema(description = "Filter by access request internal UUID", example = "550e8400-e29b-41d4-a716-446655440000")
     private String accessRequestUuid;
 
     @Schema(description = "Filter by executor response status", example = "GRANTED",
