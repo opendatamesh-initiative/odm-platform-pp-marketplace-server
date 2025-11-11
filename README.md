@@ -45,27 +45,41 @@ services.
 
 ### Access Request Management
 
-The marketplace server provides a complete workflow for managing access requests, from initial submission through executor processing to final response handling. The following sequence diagram illustrates the interaction flow:
+The marketplace server provides a complete workflow for managing access requests, from initial submission through
+executor processing to final response handling. The following sequence diagram illustrates the interaction flow:
 
 ![](docs/InteractionDiagram.jpg)
 
 #### Access Request Submission Flow
 
-1. **Client Submission**: A client submits a new access request via `POST /api/v1/pp/marketplace/requests/submit` with the access request details (identifier, operation, consumer information, provider data product FQN, etc.).
+1. **External Service Submission**: An external service submits a new access request via
+   `POST /api/v1/pp/marketplace/requests/submit` with the access request details. The `identifier` field contains an
+   external identifier that can be used to reconcile the request with the external service.
 
-2. **Request Processing**: The marketplace server validates the request and checks for duplicates. If valid, the access request is stored and assigned a unique UUID.
+2. **Request Processing**: The marketplace server validates the request and checks for duplicates. If valid, the access
+   request is stored and assigned a unique UUID. It is recommended to use the marketplace's internal UUIDs to reference
+   access requests within the platform, as an access request's natural key is the combination of the external identifier
+   and the operation.
 
-3. **Executor Forwarding**: The marketplace server forwards the access request to one or more configured marketplace executors. The system attempts to submit to active executors until one successfully accepts the request.
+3. **Executor Forwarding**: The marketplace server forwards the access request to one or more configured marketplace
+   executors. The system attempts to submit to active executors until one successfully accepts the request. The request
+   is sent as a `MarketplaceExecutorRequestRes` object, which contains the access request UUID in the
+   `request.identifier` field.
 
-4. **Response Return**: Upon successful submission to at least one executor, the marketplace server returns the created access request (including its UUID) to the client with HTTP status 201 (Created).
+4. **Response Return**: Upon successful submission to at least one executor, the marketplace server returns the created
+   access request (including its UUID) to the client with HTTP status 201 (Created).
 
 #### Executor Response Handling Flow
 
-1. **Response Reception**: After processing the access request, the executor sends its response back to the marketplace server via `POST /api/v1/pp/marketplace/requests/{uuid}/results`, where `{uuid}` is the access request UUID received during submission.
+1. **Response Reception**: After processing the access request, the executor sends its response back to the marketplace
+   server via `POST /api/v1/pp/marketplace/requests/{uuid}/results`, where `{uuid}` is the access request UUID that was
+   received during submission.
 
-2. **Response Processing**: The marketplace server validates that the response corresponds to the original access request and stores the executor response.
+2. **Response Processing**: The marketplace server validates that the response corresponds to the original access
+   request and stores the executor response.
 
-3. **Notification**: The marketplace server sends a notification event to the notification service to inform other system components about the completed executor response.
+3. **Notification**: The marketplace server sends a notification event to the notification service to inform other
+   system components about the completed executor response.
 
 4. **Success Response**: The endpoint returns HTTP status 200 (OK) upon successful processing.
 
@@ -79,8 +93,10 @@ The marketplace server provides a complete workflow for managing access requests
 
 #### External System Interactions
 
-- **Marketplace Executors**: External services that process access requests. The marketplace server forwards requests to executors and receives their responses.
-- **Notification Service**: External service that receives events when executor responses are processed, enabling other system components to react to access request completions.
+- **Marketplace Executors**: External services that process access requests. The marketplace server forwards requests to
+  executors and receives their responses.
+- **Notification Service**: External service that receives events when executor responses are processed, enabling other
+  system components to react to access request completions.
 
 ## Prerequisites
 
