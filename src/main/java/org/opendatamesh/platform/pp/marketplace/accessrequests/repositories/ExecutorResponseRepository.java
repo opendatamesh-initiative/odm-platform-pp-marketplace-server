@@ -31,7 +31,10 @@ public interface ExecutorResponseRepository extends PagingAndSortingAndSpecifica
         }
 
         public static Specification<ExecutorResponse> hasAccessRequestConsumerIdentifier(String accessRequestConsumerIdentifier) {
-            return (root, query, cb) -> cb.equal(root.join(ExecutorResponse_.accessRequest).get(AccessRequest_.consumerIdentifier), accessRequestConsumerIdentifier);
+            return (root, query, cb) -> cb.equal(
+                cb.upper(root.join(ExecutorResponse_.accessRequest).get(AccessRequest_.consumerIdentifier)),
+                cb.upper(cb.literal(accessRequestConsumerIdentifier))
+            );
         }
     }
 } 

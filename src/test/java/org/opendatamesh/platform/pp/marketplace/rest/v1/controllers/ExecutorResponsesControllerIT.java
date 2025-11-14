@@ -754,4 +754,157 @@ public class ExecutorResponsesControllerIT extends MarketplaceApplicationIT {
                 Void.class
         );
     }
+
+    @Test
+    void whenSearchExecutorResponsesByAccessRequestConsumerIdentifierWithDifferentCaseThenReturnSameResults() {
+        // Given
+        AccessRequestRes accessRequest = new AccessRequestRes();
+        accessRequest.setIdentifier("test-request-case-insensitive");
+        accessRequest.setName("Test Request Case Insensitive");
+        accessRequest.setOperation(AccessRequestRes.AccessRequestOperationRes.MARKETPLACE_SUBSCRIBE);
+        accessRequest.setProviderDataProductFqn("test-product-case-insensitive");
+        accessRequest.setProviderDataProductPortsFqn(Arrays.asList("test-port-case-insensitive"));
+        accessRequest.setConsumerType("USER");
+        accessRequest.setConsumerIdentifier("TestConsumer-123");
+        accessRequest.setStartDate(new Date());
+        accessRequest.setEndDate(new Date(System.currentTimeMillis() + 86400000)); // +1 day
+
+        HttpEntity<AccessRequestRes> requestEntity = new HttpEntity<>(accessRequest);
+
+        // Create access request
+        ResponseEntity<AccessRequestRes> createResponse = rest.exchange(
+                apiUrl(RoutesV1.ACCESS_REQUESTS, "/submit"),
+                HttpMethod.POST,
+                requestEntity,
+                AccessRequestRes.class
+        );
+        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(createResponse.getBody()).isNotNull();
+        String uuid = createResponse.getBody().getUuid();
+        assertThat(uuid).isNotNull();
+
+        // Create executor response linked to the access request
+        MarketplaceExecutorResponseUploadRes executorResponse = new MarketplaceExecutorResponseUploadRes();
+        executorResponse.setStatus(MarketplaceExecutorResponseUploadRes.ExecutorResponseStatus.GRANTED);
+        executorResponse.setMessage("Test message for case insensitive filter");
+
+        MarketplaceExecutorResponseUploadRes.ProviderInfo providerInfo = new MarketplaceExecutorResponseUploadRes.ProviderInfo();
+        providerInfo.setDataProductFqn("test-product-case-insensitive");
+        providerInfo.setDataProductPortsFqn(Arrays.asList("test-port-case-insensitive"));
+        executorResponse.setProvider(providerInfo);
+
+        HttpEntity<MarketplaceExecutorResponseUploadRes> responseEntity = new HttpEntity<>(executorResponse);
+        Mockito.doNothing().when(notificationClient).notifyEvent(Mockito.any());
+
+        ResponseEntity<Void> submitResponse = rest.exchange(
+                apiUrl(RoutesV1.ACCESS_REQUESTS, "/" + uuid + "/results"),
+                HttpMethod.POST,
+                responseEntity,
+                Void.class
+        );
+        assertThat(submitResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        // Get the created executor response ID
+        ResponseEntity<PageUtility<MarketplaceExecutorResponseRes>> searchResponse = rest.exchange(
+                apiUrl(RoutesV1.EXECUTOR_RESPONSES) + "?accessRequestUuid=" + uuid,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<PageUtility<MarketplaceExecutorResponseRes>>() {
+                }
+        );
+        assertThat(searchResponse.getBody()).isNotNull();
+        assertThat(searchResponse.getBody().getTotalElements()).isEqualTo(1);
+        Long executorResponseId = searchResponse.getBody().getContent().get(0).getId();
+
+        // When - Search with original case
+        ResponseEntity<PageUtility<MarketplaceExecutorResponseRes>> responseOriginal = rest.exchange(
+                apiUrl(RoutesV1.EXECUTOR_RESPONSES) + "?accessRequestConsumerIdentifier={consumerId}",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<PageUtility<MarketplaceExecutorResponseRes>>() {
+                },
+                Map.of("consumerId", "TestConsumer-123")
+        );
+
+        // When - Search with lowercase
+        ResponseEntity<PageUtility<MarketplaceExecutorResponseRes>> responseLowercase = rest.exchange(
+                apiUrl(RoutesV1.EXECUTOR_RESPONSES) + "?accessRequestConsumerIdentifier={consumerId}",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<PageUtility<MarketplaceExecutorResponseRes>>() {
+                },
+                Map.of("consumerId", "testconsumer-123")
+        );
+
+        // When - Search with uppercase
+        ResponseEntity<PageUtility<MarketplaceExecutorResponseRes>> responseUppercase = rest.exchange(
+                apiUrl(RoutesV1.EXECUTOR_RESPONSES) + "?accessRequestConsumerIdentifier={consumerId}",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<PageUtility<MarketplaceExecutorResponseRes>>() {
+                },
+                Map.of("consumerId", "TESTCONSUMER-123")
+        );
+
+        // When - Search with mixed case
+        ResponseEntity<PageUtility<MarketplaceExecutorResponseRes>> responseMixedCase = rest.exchange(
+                apiUrl(RoutesV1.EXECUTOR_RESPONSES) + "?accessRequestConsumerIdentifier={consumerId}",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<PageUtility<MarketplaceExecutorResponseRes>>() {
+                },
+                Map.of("consumerId", "TeStCoNsUmEr-123")
+        );
+
+        // Then - Verify all searches return the same result
+        assertThat(responseOriginal.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseOriginal.getBody()).isNotNull();
+        assertThat(responseOriginal.getBody().getTotalElements()).isGreaterThanOrEqualTo(1);
+        MarketplaceExecutorResponseRes foundResponseOriginal = responseOriginal.getBody().getContent().stream()
+                .filter(res -> executorResponseId.equals(res.getId()))
+                .findFirst()
+                .orElse(null);
+        assertThat(foundResponseOriginal).isNotNull();
+
+        assertThat(responseLowercase.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseLowercase.getBody()).isNotNull();
+        assertThat(responseLowercase.getBody().getTotalElements()).isGreaterThanOrEqualTo(1);
+        MarketplaceExecutorResponseRes foundResponseLowercase = responseLowercase.getBody().getContent().stream()
+                .filter(res -> executorResponseId.equals(res.getId()))
+                .findFirst()
+                .orElse(null);
+        assertThat(foundResponseLowercase).isNotNull();
+
+        assertThat(responseUppercase.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseUppercase.getBody()).isNotNull();
+        assertThat(responseUppercase.getBody().getTotalElements()).isGreaterThanOrEqualTo(1);
+        MarketplaceExecutorResponseRes foundResponseUppercase = responseUppercase.getBody().getContent().stream()
+                .filter(res -> executorResponseId.equals(res.getId()))
+                .findFirst()
+                .orElse(null);
+        assertThat(foundResponseUppercase).isNotNull();
+
+        assertThat(responseMixedCase.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseMixedCase.getBody()).isNotNull();
+        assertThat(responseMixedCase.getBody().getTotalElements()).isGreaterThanOrEqualTo(1);
+        MarketplaceExecutorResponseRes foundResponseMixedCase = responseMixedCase.getBody().getContent().stream()
+                .filter(res -> executorResponseId.equals(res.getId()))
+                .findFirst()
+                .orElse(null);
+        assertThat(foundResponseMixedCase).isNotNull();
+
+        // Verify all found responses are the same
+        assertThat(foundResponseOriginal.getAccessRequestUuid()).isEqualTo(uuid);
+        assertThat(foundResponseLowercase.getAccessRequestUuid()).isEqualTo(uuid);
+        assertThat(foundResponseUppercase.getAccessRequestUuid()).isEqualTo(uuid);
+        assertThat(foundResponseMixedCase.getAccessRequestUuid()).isEqualTo(uuid);
+
+        // Cleanup
+        rest.exchange(
+                apiUrl(RoutesV1.ACCESS_REQUESTS, "/" + uuid),
+                HttpMethod.DELETE,
+                null,
+                Void.class
+        );
+    }
 } 
