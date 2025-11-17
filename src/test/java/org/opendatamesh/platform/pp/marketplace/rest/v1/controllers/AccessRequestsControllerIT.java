@@ -12,6 +12,7 @@ import org.opendatamesh.platform.pp.marketplace.rest.v1.RoutesV1;
 import org.opendatamesh.platform.pp.marketplace.rest.v1.resources.accessrequests.AccessRequestRes;
 import org.opendatamesh.platform.pp.marketplace.rest.v1.resources.events.ExecutorResultReceivedEvent;
 import org.opendatamesh.platform.pp.marketplace.rest.v1.resources.executors.MarketplaceExecutorResponseRes;
+import org.opendatamesh.platform.pp.marketplace.rest.v1.resources.executors.MarketplaceExecutorResponseUploadRes;
 import org.opendatamesh.platform.pp.marketplace.utils.client.jackson.PageUtility;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -23,6 +24,7 @@ import org.opendatamesh.platform.pp.marketplace.client.NotificationClient;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AccessRequestsControllerIT extends MarketplaceApplicationIT {
@@ -319,6 +321,103 @@ public class AccessRequestsControllerIT extends MarketplaceApplicationIT {
         assertEquals(accessRequest.getIdentifier(), eventAccessRequest.getIdentifier());
 
         // Teardown
+        rest.exchange(
+            apiUrl(RoutesV1.ACCESS_REQUESTS, "/" + uuid),
+            HttpMethod.DELETE,
+            null,
+            Void.class
+        );
+    }
+
+    @Test
+    void whenHandleExecutorResponseThenAccessRequestIdentifierIsMappedInEvent() {
+        // Given
+        AccessRequestRes accessRequest = new AccessRequestRes();
+        accessRequest.setIdentifier("test-request-access-identifier");
+        accessRequest.setName("Test Request for Access Identifier");
+        accessRequest.setOperation(AccessRequestRes.AccessRequestOperationRes.MARKETPLACE_SUBSCRIBE);
+        accessRequest.setProviderDataProductFqn("test-product");
+        accessRequest.setProviderDataProductPortsFqn(Arrays.asList("test-port-1", "test-port-2"));
+        accessRequest.setConsumerType("USER");
+        accessRequest.setConsumerIdentifier("test-consumer-access-identifier");
+        accessRequest.setStartDate(new Date());
+        accessRequest.setEndDate(new Date(System.currentTimeMillis() + 86400000)); // +1 day
+
+        HttpEntity<AccessRequestRes> requestEntity = new HttpEntity<>(accessRequest);
+        
+        // Create an access request
+        ResponseEntity<AccessRequestRes> createResponse = rest.exchange(
+                apiUrl(RoutesV1.ACCESS_REQUESTS, "/submit"),
+                HttpMethod.POST,
+                requestEntity,
+                AccessRequestRes.class
+        );
+        assertNotNull(createResponse.getBody());
+        String uuid = createResponse.getBody().getUuid();
+        String accessRequestIdentifier = createResponse.getBody().getIdentifier();
+
+        // Create executor response
+        MarketplaceExecutorResponseUploadRes executorResponse = new MarketplaceExecutorResponseUploadRes();
+        executorResponse.setStatus(MarketplaceExecutorResponseUploadRes.ExecutorResponseStatus.GRANTED);
+        executorResponse.setMessage("Test success message");
+        
+        MarketplaceExecutorResponseUploadRes.ProviderInfo providerInfo = new MarketplaceExecutorResponseUploadRes.ProviderInfo();
+        providerInfo.setDataProductFqn("test-product");
+        providerInfo.setDataProductPortsFqn(Arrays.asList("test-port-1"));
+        executorResponse.setProvider(providerInfo);
+
+        HttpEntity<MarketplaceExecutorResponseUploadRes> responseEntity = new HttpEntity<>(executorResponse);
+
+        // Stub notificationClient.notifyEvent to do nothing
+        Mockito.doNothing().when(notificationClient).notifyEvent(Mockito.any());
+
+        // When
+        ResponseEntity<Void> response = rest.exchange(
+                apiUrl(RoutesV1.ACCESS_REQUESTS, "/" + uuid + "/results"),
+                HttpMethod.POST,
+                responseEntity,
+                Void.class
+        );
+
+        // Then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        
+        // Capture the event sent to notificationClient
+        ArgumentCaptor<Object> eventCaptor = ArgumentCaptor.forClass(Object.class);
+        Mockito.verify(notificationClient, Mockito.atLeastOnce()).notifyEvent(eventCaptor.capture());
+        Object event = eventCaptor.getValue();
+        
+        // Assert event content
+        assertInstanceOf(ExecutorResultReceivedEvent.class, event);
+        ExecutorResultReceivedEvent execEvent = (ExecutorResultReceivedEvent) event;
+        ExecutorResultReceivedEvent.ExecutorResultReceivedEventState afterState = execEvent.getAfterState();
+        assertNotNull(afterState);
+        
+        // Verify executor response in event has accessRequestIdentifier correctly mapped
+        ExecutorResultReceivedEvent.ExecutorResultReceivedEventExecutorResponse eventExecutorResponse = afterState.getExecutorResponse();
+        assertNotNull(eventExecutorResponse);
+        
+        // Build expected executor response event object
+        ExecutorResultReceivedEvent.ExecutorResultReceivedEventExecutorResponse expectedEventExecutorResponse = 
+                new ExecutorResultReceivedEvent.ExecutorResultReceivedEventExecutorResponse();
+        expectedEventExecutorResponse.setAccessRequestIdentifier(accessRequestIdentifier);
+        expectedEventExecutorResponse.setStatus(
+                ExecutorResultReceivedEvent.ExecutorResultReceivedEventExecutorResponse.ExecutorResultReceivedEventExecutorResponseStatus.GRANTED);
+        expectedEventExecutorResponse.setMessage("Test success message");
+        
+        ExecutorResultReceivedEvent.ExecutorResultReceivedEventProviderInfo expectedProviderInfo = 
+                new ExecutorResultReceivedEvent.ExecutorResultReceivedEventProviderInfo();
+        expectedProviderInfo.setDataProductFqn("test-product");
+        expectedProviderInfo.setDataProductPortsFqn(Arrays.asList("test-port-1"));
+        expectedEventExecutorResponse.setProvider(expectedProviderInfo);
+        
+        // Verify using recursive comparison, ignoring timestamp fields from VersionedRes
+        assertThat(eventExecutorResponse)
+                .usingRecursiveComparison()
+                .ignoringFields("createdAt", "updatedAt")
+                .isEqualTo(expectedEventExecutorResponse);
+
+        // Cleanup
         rest.exchange(
             apiUrl(RoutesV1.ACCESS_REQUESTS, "/" + uuid),
             HttpMethod.DELETE,

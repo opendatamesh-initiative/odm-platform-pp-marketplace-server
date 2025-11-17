@@ -15,6 +15,7 @@ public interface ExecutorResultReceivedEventMapper {
 
     @Mapping(target = "provider.dataProductFqn", source = "providerDataProductFqn")
     @Mapping(target = "provider.dataProductPortsFqn", source = "providerDataProductPortsFqn")
+    @Mapping(target = "accessRequestIdentifier", source = "accessRequest.identifier")
     ExecutorResultReceivedEvent.ExecutorResultReceivedEventExecutorResponse toEventExecutorResponse(ExecutorResponse entity);
 
     default ObjectNode stringToProperties(String properties) {
