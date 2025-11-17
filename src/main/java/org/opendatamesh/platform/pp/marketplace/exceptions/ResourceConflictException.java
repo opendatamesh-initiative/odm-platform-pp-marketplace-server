@@ -2,16 +2,17 @@ package org.opendatamesh.platform.pp.marketplace.exceptions;
 
 import org.springframework.http.HttpStatus;
 
-public class ResourceConflictException extends MarketplaceException {
-    
-    private static final long serialVersionUID = 1L;
-    private static final String ERROR_CODE = "CONFLICT";
-    
+public class ResourceConflictException extends MarketplaceApiException {
     public ResourceConflictException(String message) {
-        super(message, ERROR_CODE, HttpStatus.CONFLICT);
+        super(message);
     }
-    
+
     public ResourceConflictException(String message, Throwable cause) {
-        super(message, ERROR_CODE, HttpStatus.CONFLICT, cause);
+        super(message, cause);
+    }
+
+    @Override
+    public HttpStatus getStatus() {
+        return HttpStatus.CONFLICT;
     }
 }
